@@ -12,7 +12,7 @@ import sys
 
 
 LOCAL_LIST_NAME = 'stations'
-DISPLAY_IN_TABLE = True
+DISPLAY_IN_TABLE = False 
 
 
 # 返回当天日期(YYYYMMDD)
@@ -212,7 +212,7 @@ def display_data(parsed):
             else:
                 train_string += '{0}--[{1}]--'.format(station_code_to_name(train['始发']), station_code_to_name(train['出发']))
             if train['终到'] == train['到达']:
-                train_string += '[{0}'.format(station_code_to_name(train['终到']))
+                train_string += '[{0}]'.format(station_code_to_name(train['终到']))
             else:
                 train_string += '[{0}]--{1}'.format(station_code_to_name(train['到达']), station_code_to_name(train['终到']))
             train_string += '  '
