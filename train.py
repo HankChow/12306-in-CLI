@@ -8,11 +8,12 @@ import json
 import os
 import re
 import requests
+import sendmail
 import sys
 
 
 LOCAL_LIST_NAME = 'stations'
-DISPLAY_IN_TABLE = False 
+DISPLAY_IN_TABLE = True
 
 
 # 返回当天日期(YYYYMMDD)
@@ -176,11 +177,11 @@ def filt_data(data_list, filt):
 
 
 # 数据解析后转为易读的结果
-def display_data(parsed):
+def display_data(parsed, is_email):
     
     ticket_types = ['商务', '一等', '二等', '高软', '软卧', '硬卧', '软座', '硬座', '无座']
-    
-    if DISPLAY_IN_TABLE:
+
+    if DISPLAY_IN_TABLE and not is_email:
         from prettytable import PrettyTable
         table_head = ['车次', '始发', '出发', '到达', '终到', '发时', '达时', '历时']
         full_table_head = table_head + ticket_types
@@ -223,14 +224,20 @@ def display_data(parsed):
                     train_string += train[ticket] + ticket
                     train_string += ' '
             train_display.append(train_string)
+        outputString = ''
         for item in train_display:
-            print(item)
+            outputString += item + '\n'
+        if is_email:
+            sendmail.sendEmail('余票情况', outputString)
+            print('邮件已发送')
+        else:
+            print(outputString)
             
 
 # 获取命令行参数
 def get_options():
     
-    options, args = getopt.getopt(sys.argv[1:], 'd:f:t:s:', longopts=['date=', 'from=', 'to=', 'sort=', 'desc', 'filter='])
+    options, args = getopt.getopt(sys.argv[1:], 'd:f:t:s:', longopts=['date=', 'from=', 'to=', 'sort=', 'desc', 'filter=', 'email'])
     
     options_dict = {}
     for name, value in options:
@@ -246,6 +253,8 @@ def get_options():
             options_dict['desc'] = True
         if name in ['--filter']:
             options_dict['filter'] = value
+        if name in ['--email']:
+            options_dict['email'] = True
 
     return options_dict
 
@@ -292,7 +301,7 @@ def run():
     options = dispose_options(options)
     query_result = train_query(options['date'], options['from'], options['to'])
     disposed_result = dispose_result(query_result, options)
-    display_data(disposed_result)
+    display_data(disposed_result, is_email=('email' in options.keys()))
     
 
 if __name__ == '__main__':
