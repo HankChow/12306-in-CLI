@@ -15,6 +15,8 @@ import sys
 LOCAL_LIST_NAME = 'stations'
 DISPLAY_IN_TABLE = True
 
+STATION_LIST_UPDATED = False
+
 
 # 返回当天日期(YYYYMMDD)
 def get_today_date():
@@ -54,7 +56,8 @@ def update_station_list():
         newlist = '\n'.join(stations)
         open(current_list_name, 'w').write(newlist)
         os.rename(current_list_name, LOCAL_LIST_NAME + get_today_date())
-        print('Station List updated.')
+        global STATION_LIST_UPDATED
+        STATION_LIST_UPDATED = True
 
 
 # 车站名转为三字车站代码
@@ -204,6 +207,8 @@ def display_data(parsed, is_email):
                     table_row.append('')
             pt.add_row(table_row)
         print(pt)
+        if STATION_LIST_UPDATED:
+            print('Station List has been updated.')
     else:
         train_display = []
         for train in parsed:
@@ -232,6 +237,8 @@ def display_data(parsed, is_email):
             print('邮件已发送')
         else:
             print(outputString)
+            if STATION_LIST_UPDATED:
+                print('Station List has been updated.')
             
 
 # 获取命令行参数
