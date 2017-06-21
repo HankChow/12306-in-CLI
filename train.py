@@ -230,12 +230,14 @@ def display_data(parsed, is_email):
                     train_string += ' '
             train_display.append(train_string)
         outputString = ''
-        for item in train_display:
-            outputString += item + '\n'
         if is_email:
+            for item in train_display:
+                outputString += item + '<br>'
             sendmail.sendEmail('余票情况', outputString)
             print('邮件已发送')
         else:
+            for item in train_display:
+                outputString += item + '\n'
             print(outputString)
             if STATION_LIST_UPDATED:
                 print('Station List has been updated.')
