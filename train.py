@@ -18,8 +18,10 @@ DISPLAY_IN_TABLE = True
 STATION_LIST_UPDATED = False
 
 
-# 返回当天日期(YYYYMMDD)
 def get_today_date():
+    """
+    返回当天日期(以YYYYMMDD格式)
+    """
 
     this_year = str(datetime.datetime.today().year)
     this_month = str(datetime.datetime.today().month).zfill(2)
@@ -28,8 +30,10 @@ def get_today_date():
     return this_year + this_month + this_day
 
 
-# 返回当前版本的 staion 列表文件名
 def get_current_station_list_name():
+    """
+    返回当前版本的 staion 列表文件名
+    """
 
     def get_list_name(name):
         if name.startswith(LOCAL_LIST_NAME):
@@ -39,8 +43,10 @@ def get_current_station_list_name():
     return current_station_list_name
 
 
-# 检测是否需要更新 station 列表文件，有必要时更新
 def update_station_list():
+    """
+    检测是否需要更新 station 列表文件，有必要时更新
+    """
 
     url = 'https://kyfw.12306.cn/otn/resources/js/framework/station_name.js'
 
@@ -60,9 +66,12 @@ def update_station_list():
         STATION_LIST_UPDATED = True
 
 
-# 车站名转为三字车站代码
 def station_code_to_name(code):
-    
+    """
+    三字车站代码转为车站名
+    code: 三字车站代码
+    """
+
     stations = open(get_current_station_list_name()).readlines()
     for station in stations:
         if code == station.split('|')[2]:
@@ -71,8 +80,11 @@ def station_code_to_name(code):
     return None
 
 
-# 三字车站代码转为车站名
 def station_name_to_code(name):
+    """
+    车站名转为三字车站代码
+    name: 车站名
+    """
     
     stations = open(get_current_station_list_name()).readlines()
     for station in stations:
@@ -82,8 +94,13 @@ def station_name_to_code(name):
     return None
 
 
-# 按照日期、起止站查询，返回原始 JSON 
 def train_query(train_date, from_station, to_station):
+    """
+    按照日期、起止站查询，返回原始 JSON
+    train_date: 出发日期，格式为 YYYYMMDD
+    from_station: 出发站的三字车站代码
+    to_station: 到达站的三字车站代码
+    """
     
     url = 'https://kyfw.12306.cn/otn/leftTicket/query'
     qkeys = ['leftTicketDTO.train_date', 'leftTicketDTO.from_station', 'leftTicketDTO.to_station', 'purpose_codes']
@@ -99,8 +116,11 @@ def train_query(train_date, from_station, to_station):
     return raw_result
 
 
-# 查询结果的原始 JSON 解析为列表
 def train_parse(raw_json):
+    """
+    查询结果的原始 JSON 解析为列表
+    raw_json: query 得到的原始 JSON
+    """
     
     j = json.loads(raw_json)
     if 'data' not in j.keys():
@@ -147,8 +167,13 @@ def train_parse(raw_json):
     return train_lists
 
 
-# 根据某一字段对结果进行排序
 def sort_data(data_list, sort_key, desc=False):
+    """
+    根据某一字段对结果进行排序
+    data_list: 结果源数据，为 list
+    sort_key: 排序依据的字段名，为 string
+    desc: 是否为降序排列，默认为否
+    """
 
     for item in data_list:
         if sort_key not in item.keys():
@@ -161,8 +186,12 @@ def sort_data(data_list, sort_key, desc=False):
     return data_list
 
 
-# 对结果进行筛选
 def filt_data(data_list, filt):
+    """
+    对结果进行筛选
+    data_list: 结果源数据，为 list
+    filt: 需要保留的车次，为 string ，但每个字符独立代表一种车次
+    """
 
     possible_train_title = ['K', 'T', 'Z', 'C', 'D', 'G', 'Y', 'L', 'S']
     filt_list = list(filt.upper())
@@ -179,8 +208,12 @@ def filt_data(data_list, filt):
     return list(filter(filt_func, data_list))
 
 
-# 数据解析后转为易读的结果
 def display_data(parsed, is_email):
+    """
+    数据解析后转为易读的结果
+    parsed: 解析后的结果，为 list ，且其中每个元素均为 dict
+    is_email: 是否发送邮件，为 boolean
+    """
     
     ticket_types = ['商务', '一等', '二等', '高软', '软卧', '硬卧', '软座', '硬座', '无座']
 
@@ -243,8 +276,10 @@ def display_data(parsed, is_email):
                 print('Station List has been updated.')
             
 
-# 获取命令行参数
 def get_options():
+    """
+    获取命令行参数
+    """
     
     options, args = getopt.getopt(sys.argv[1:], 'd:f:t:s:', longopts=['date=', 'from=', 'to=', 'sort=', 'desc', 'filter=', 'email'])
     
@@ -268,8 +303,11 @@ def get_options():
     return options_dict
 
 
-# 处理命令行参数
 def dispose_options(options):
+    """
+    处理命令行参数
+    options: 获取到的命令行参数列表
+    """
     
     for item in ['date', 'from', 'to']:
         if item not in options.keys():
@@ -287,8 +325,12 @@ def dispose_options(options):
     return disposed_options
     
 
-# 处理查询结果
 def dispose_result(raw_result, options):
+    """
+    处理查询结果
+    raw_result: query 后得到的结果
+    options: 命令行参数列表
+    """
 
     parsed_result = train_parse(raw_result)
     if 'filter' in options:
