@@ -64,6 +64,9 @@ def update_station_list():
         os.rename(current_list_name, LOCAL_LIST_NAME + get_today_date())
         global STATION_LIST_UPDATED
         STATION_LIST_UPDATED = True
+        return True
+    
+    return False
 
 
 def station_code_to_name(code):
@@ -281,7 +284,7 @@ def get_options():
     获取命令行参数
     """
     
-    options, args = getopt.getopt(sys.argv[1:], 'd:f:t:s:', longopts=['date=', 'from=', 'to=', 'sort=', 'desc', 'filter=', 'email'])
+    options, args = getopt.getopt(sys.argv[1:], 'd:f:t:s:u', longopts=['date=', 'from=', 'to=', 'sort=', 'desc', 'filter=', 'email', 'update'])
     
     options_dict = {}
     for name, value in options:
@@ -299,6 +302,8 @@ def get_options():
             options_dict['filter'] = value
         if name in ['--email']:
             options_dict['email'] = True
+        if name in ['-u', '--update']:
+            options_dict['update'] = True
 
     return options_dict
 
@@ -348,7 +353,13 @@ def dispose_result(raw_result, options):
 
 def run():
     options = get_options()
-    update_station_list()
+    is_updated = update_station_list()
+    if 'update' in options:
+        if is_updated:
+            print('Station List has been updated.')
+        else:
+            print('Station List has not been updated.')
+        exit()
     options = dispose_options(options)
     query_result = train_query(options['date'], options['from'], options['to'])
     disposed_result = dispose_result(query_result, options)
