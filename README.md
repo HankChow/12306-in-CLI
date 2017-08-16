@@ -23,7 +23,8 @@
 ## 文件
 * `train.py`：主文件；
 * `stationsYYYYMMDD`：存放车站名与车站代码对应关系，后八位为最后更新日期。每次运行主文件时会检查该文件是否需要更新，如需更新，将会自动更新并修改文件名后八位为最新更新日期；
-* `filters.conf`：更详细的筛选条件，以配置文件形式使用。
+* `filters.conf`：更详细的筛选条件，以配置文件形式使用；
+* `auto_update.sh`：用于检查 Station List 是否需要更新，如需更新则调用 -u 参数进行更新并更新 git 记录和推送到 GitHub 。
 
 ## 杂项
 * 输出结果默认使用表格显示，因此需要 prettytable 库。若无 prettytable 库或不需要表格显示，在`train.py`中将`DISPLAY_IN_TABLE`值改为`False`即可。
