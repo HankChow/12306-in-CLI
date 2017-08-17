@@ -64,8 +64,12 @@ def update_station_list():
         os.rename(current_list_name, LOCAL_LIST_NAME + get_today_date())
         global STATION_LIST_UPDATED
         STATION_LIST_UPDATED = True
+        with open('./update.log', 'a+') as f:
+            f.write('{0} updated.\n'.format(os.popen('date').read().strip())) 
         return True
     
+    with open('./update.log', 'a+') as f:
+        f.write('{0} NOT updated.\n'.format(os.popen('date').read().strip()))
     return False
 
 
